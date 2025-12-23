@@ -5,673 +5,448 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>District Ticket Generator</title>
     <style>
-        :root {
-            --bg1: #000;
-            --bg2: #071428;
-            --card: #0b0b0d;
-            --muted: #9aa3ad;
-            --accent: #ff6b6b;
-            --white: #ffffff;
-        }
-
-        * {
-            box-sizing: border-box;
-        }
-
         body {
-            margin: 0;
-            min-height: 100vh;
-            background: radial-gradient(1000px 600px at 10% 10%, #081220 0%, transparent 20%),
-                        radial-gradient(800px 500px at 90% 90%, #08121a 0%, transparent 20%),
-                        linear-gradient(180deg, var(--bg1), var(--bg2) 60%);
-            color: var(--white);
-            font-family: Inter, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #0a0a0b;
+            color: white;
             display: flex;
-            align-items: center;
             justify-content: center;
-            padding: 28px;
-            user-select: none; /* Disable text selection */
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+            gap: 20px;
         }
 
-        .layout {
+        .container {
+            display: flex;
+            gap: 20px;
+            max-width: 1200px;
             width: 100%;
-            max-width: 1100px;
-            display: grid;
-            grid-template-columns: 1fr 480px;
-            gap: 26px;
         }
 
-        .panel {
-            background: linear-gradient(180deg, #07101a, #07111b);
+        .form-panel {
+            background: #121214;
+            padding: 20px;
             border-radius: 12px;
-            padding: 18px;
-            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.6);
+            width: 350px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
         }
 
-        h2 {
-            margin: 0 0 6px;
-            font-size: 20px;
-            color: #e9eef6;
+        .form-panel h2 {
+            margin-bottom: 10px;
+            font-size: 1.5em;
+            color: #fff;
         }
 
-        p.hint {
-            color: var(--muted);
-            margin: 6px 0 12px;
-            font-size: 13px;
+        .form-panel p {
+            font-size: 0.85em;
+            color: #aaa;
+            margin-bottom: 15px;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
         }
 
         label {
             display: block;
-            font-size: 13px;
-            color: var(--muted);
-            margin-top: 12px;
-            margin-bottom: 6px;
+            margin-bottom: 5px;
+            font-size: 0.9em;
+            color: #ddd;
         }
 
-        input[type="text"],
-        input[type="date"],
-        input[type="time"],
-        input[type="file"] {
+        input, textarea {
             width: 100%;
-            padding: 10px 12px;
-            border-radius: 8px;
-            border: 1px solid rgba(255, 255, 255, 0.04);
-            background: rgba(255, 255, 255, 0.02);
-            color: var(--white);
-            font-size: 14px;
+            padding: 10px;
+            border: 1px solid #333;
+            border-radius: 6px;
+            background: #1e1e20;
+            color: white;
+            font-size: 0.95em;
         }
 
-        .grid2 {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 12px;
-        }
-
-        .actions {
-            display: flex;
-            gap: 12px;
-            margin-top: 14px;
-        }
-
-        .btn {
-            padding: 12px 14px;
-            border-radius: 10px;
+        button {
+            width: 100%;
+            padding: 12px;
             border: none;
-            font-weight: 700;
+            border-radius: 6px;
             cursor: pointer;
-            font-size: 14px;
+            font-weight: bold;
+            font-size: 1em;
+            transition: background 0.2s;
         }
 
-        .btn.primary {
-            background: linear-gradient(90deg, var(--accent), #ee5a24);
-            color: #fff;
-            flex: 1;
+        .generate-btn {
+            background: linear-gradient(90deg, #ff6b6b, #ff8e53);
+            color: white;
         }
 
-        .btn.ghost {
-            background: transparent;
-            border: 1px solid rgba(255, 255, 255, 0.06);
-            color: var(--white);
-            width: 110px;
+        .generate-btn:hover {
+            background: linear-gradient(90deg, #ff5c5c, #ff7e43);
         }
 
-        /* preview ticket */
-        .preview-wrap {
+        .download-btn {
+            background: linear-gradient(90deg, #4cd964, #5ac8fa);
+            color: white;
+            margin-top: 10px;
+        }
+
+        .download-btn:hover {
+            background: linear-gradient(90deg, #3cc95a, #4ab8ea);
+        }
+
+        .preview-panel {
+            position: relative;
+            width: 350px;
+            background: #0a0a0b;
+            border-radius: 16px;
+            overflow: hidden;
+            box-shadow: 0 8px 40px rgba(0, 0, 0, 0.7);
+            padding: 20px;
             display: flex;
+            flex-direction: column;
             align-items: center;
-            justify-content: center;
         }
 
         .ticket {
-            width: 420px;
-            background: linear-gradient(180deg, #0a0a0b, #0b0b0d);
-            border-radius: 16px;
-            padding: 18px;
-            box-shadow: 0 18px 40px rgba(0, 0, 0, 0.6);
-            color: #fff;
-            position: relative;
-            overflow: hidden;
-            font-size: 14px;
-        }
-
-        /* top header (pattern area + logo) */
-        .ticket .header {
-            height: 86px;
-            background: linear-gradient(180deg, #14121a, #0b0b0d);
-            border-radius: 10px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            margin: -18px -18px 12px -18px;
-            position: relative;
-        }
-
-        /* slight pattern line */
-        .logo-img {
-            width: 160px;
-            height: auto;
-            display: block;
-            filter: drop-shadow(0 6px 18px rgba(0, 0, 0, 0.6));
-        }
-
-        .top {
-            display: flex;
-            gap: 12px;
-            align-items: center;
-        }
-
-        .poster {
-            width: 60px;
-            height: 86px;
-            border-radius: 6px;
-            background: linear-gradient(180deg, #222, #111);
-            overflow: hidden;
-            flex: 0 0 60px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .poster img {
             width: 100%;
-            height: 100%;
-            object-fit: cover;
-            display: block;
-        }
-
-        .title {
-            font-weight: 800;
-            font-size: 16px;
-            color: #fff;
-        }
-
-        .meta {
-            color: var(--muted);
-            font-size: 12px;
-            margin-top: 4px;
-        }
-
-        .big-placeholder {
-            width: 220px;
-            height: 220px;
-            background: #fff;
+            background: #0a0a0b;
             border-radius: 12px;
-            display: block;
-            margin: 18px auto;
-            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.4);
+            padding: 20px;
+            position: relative;
+            overflow: hidden;
+            box-shadow: inset 0 0 20px rgba(0, 0, 0, 0.5);
         }
 
-        .ticket .info {
+        .ticket-header {
             text-align: center;
-            margin-top: 6px;
+            margin-bottom: 20px;
         }
 
-        .ticket .info .line {
-            font-size: 12px;
-            color: var(--muted);
-            margin-top: 8px;
-            letter-spacing: 1px;
+        .ticket-logo {
+            width: 120px;
+            height: auto;
+            margin: 0 auto 15px;
+            filter: brightness(1.5);
         }
 
-        .ticket .info .value {
-            font-weight: 800;
-            font-size: 14px;
-            margin-top: 6px;
+        .movie-info {
+            display: flex;
+            align-items: flex-start;
+            gap: 15px;
+            margin-bottom: 20px;
         }
 
-        /* perforation and bottom */
-        .perforation {
-            height: 28px;
+        .movie-poster {
+            width: 60px;
+            height: 90px;
+            object-fit: cover;
+            border-radius: 4px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.5);
+        }
+
+        .movie-details {
+            flex: 1;
+        }
+
+        .movie-title {
+            font-size: 1.3em;
+            font-weight: bold;
+            margin-bottom: 5px;
+            line-height: 1.2;
+        }
+
+        .movie-meta {
+            font-size: 0.85em;
+            color: #bbb;
+            margin-bottom: 5px;
+        }
+
+        .movie-date-time {
+            font-size: 0.9em;
+            color: #ddd;
+            margin-bottom: 10px;
+        }
+
+        .qr-placeholder {
+            width: 180px;
+            height: 180px;
+            background: white;
+            border-radius: 8px;
+            margin: 20px auto;
             display: flex;
             align-items: center;
             justify-content: center;
-            margin-top: 14px;
-            position: relative;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
         }
 
-        .perforation::before {
-            content: "";
-            width: 70%;
-            height: 2px;
-            border-top: 2px dashed rgba(255, 255, 255, 0.08);
-            display: block;
-        }
-
-        .address {
-            padding: 18px 22px;
+        .ticket-details {
             text-align: center;
-            color: #d2d2d2;
-            font-size: 14px;
+            margin-bottom: 20px;
+        }
+
+        .screen, .seat, .theatre {
+            font-size: 0.9em;
+            color: #ddd;
+            margin: 8px 0;
+        }
+
+        .screen span, .seat span, .theatre span {
+            font-weight: bold;
+            font-size: 1.1em;
+        }
+
+        .perforation {
+            width: 100%;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, #555 20%, #555 80%, transparent);
+            margin: 20px 0;
+        }
+
+        .theatre-address {
+            font-size: 0.8em;
+            color: #999;
+            text-align: center;
+            margin-bottom: 10px;
             line-height: 1.4;
         }
 
-        .booking {
-            color: rgba(255, 255, 255, 0.6);
-            font-size: 12px;
+        .booking-id {
+            font-size: 0.75em;
+            color: #777;
             text-align: center;
-            margin-top: 6px;
+            margin-bottom: 20px;
         }
 
-        /* bottom branding */
-        .bottom-bar {
-            width: 100%;
+        .ticket-footer {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-top: 22px;
-            gap: 12px;
+            padding-top: 15px;
+            border-top: 1px solid #222;
+            margin-top: 15px;
         }
 
-        .bottom-logo {
-            width: 110px;
+        .footer-logo {
+            width: 80px;
             height: auto;
-            opacity: 0.95;
-            filter: drop-shadow(0 6px 16px rgba(0, 0, 0, 0.6));
         }
 
         .hashtag {
-            font-weight: 800;
-            font-size: 20px;
+            font-size: 0.9em;
+            font-weight: bold;
             color: #fff;
         }
 
-        @media (max-width: 920px) {
-            .layout {
-                grid-template-columns: 1fr;
+        /* Add subtle diagonal lines to header */
+        .ticket-header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 100px;
+            background: repeating-linear-gradient(
+                45deg,
+                rgba(0, 0, 0, 0.1),
+                rgba(0, 0, 0, 0.1) 1px,
+                transparent 1px,
+                transparent 2px
+            );
+            z-index: -1;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .container {
+                flex-direction: column;
             }
-            .preview-wrap {
-                margin-top: 18px;
-                justify-content: center;
+            .preview-panel {
+                width: 100%;
+                max-width: 350px;
             }
         }
     </style>
 </head>
-<body oncontextmenu="return false;">
-    <div class="layout">
-        <!-- Left: form -->
-        <div class="panel">
-            <h2>District Ticket — Generator (no QR)</h2>
-            <p class="hint">Upload poster (optional). Fill details. Generate preview and download ticket PNG. QR placeholder will be blank — paste QR manually using PicsArt.</p>
-            <label>Movie Poster (optional)</label>
-            <input id="posterFile" type="file" accept="image/*">
-            <label>Movie Title</label>
-            <input id="movieName" type="text" placeholder="Akhanda 2: Thaandavam">
-            <div class="grid2">
-                <div>
-                    <label>Movie Date</label>
-                    <input id="movieDate" type="date">
-                </div>
-                <div>
-                    <label>Movie Time</label>
-                    <input id="movieTime" type="time">
-                </div>
+<body>
+    <div class="container">
+        <div class="form-panel">
+            <h2>District Ticket Generator</h2>
+            <p>Fill in the details below to generate a realistic District by Zomato movie ticket.</p>
+
+            <div class="form-group">
+                <label for="poster">Movie Poster (optional)</label>
+                <input type="file" id="poster" accept="image/*">
             </div>
-            <div class="grid2">
-                <div>
-                    <label>Theatre</label>
-                    <input id="theatre" type="text" placeholder="V Mega Anand Cine Complex, National Highway 18, Kurnool">
-                </div>
-                <div>
-                    <label>Screen</label>
-                    <input id="screen" type="text" placeholder="Screen-1">
-                </div>
+
+            <div class="form-group">
+                <label for="title">Movie Title</label>
+                <input type="text" id="title" placeholder="Akhanda 2: Thaandavam" value="Avatar 3: Fire & Ash">
             </div>
-            <label>Seats (comma separated)</label>
-            <input id="seats" type="text" placeholder="GOLD-B9">
-            <div class="grid2" style="margin-top:12px;">
-                <div>
-                    <label>Language / Format</label>
-                    <input id="lang" type="text" placeholder="Telugu | 2D">
-                </div>
-                <div>
-                    <label>Booking ID (optional)</label>
-                    <input id="booking" type="text" placeholder="Leave empty to auto-generate">
-                </div>
+
+            <div class="form-group">
+                <label for="language">Language / Format</label>
+                <input type="text" id="language" placeholder="Telugu | 2D" value="Telugu | 2D">
             </div>
-            <div class="actions">
-                <button class="btn primary" onclick="generatePreview()">Generate Preview</button>
-                <button class="btn ghost" onclick="resetAll()">Reset</button>
+
+            <div class="form-group">
+                <label for="date">Movie Date</label>
+                <input type="date" id="date" value="2025-12-23">
             </div>
-            <p class="small" style="margin-top:12px;color:var(--muted)">After preview, click <strong>Download Ticket</strong> on the right to save the full PNG. Then paste QR using PicsArt into the white square placeholder.</p>
+
+            <div class="form-group">
+                <label for="time">Movie Time</label>
+                <input type="time" id="time" value="21:30">
+            </div>
+
+            <div class="form-group">
+                <label for="theatre">Theatre</label>
+                <input type="text" id="theatre" placeholder="V Mega Anand Cine Complex" value="Megaplex Mall of Asia Bangalore">
+            </div>
+
+            <div class="form-group">
+                <label for="screen">Screen</label>
+                <input type="text" id="screen" placeholder="Screen-1" value="1">
+            </div>
+
+            <div class="form-group">
+                <label for="seats">Seats (comma separated)</label>
+                <input type="text" id="seats" placeholder="GOLD-B9" value="PRIME- Q3,Q4">
+            </div>
+
+            <div class="form-group">
+                <label for="bookingId">Booking ID (optional)</label>
+                <input type="text" id="bookingId" placeholder="Leave empty to auto-generate">
+            </div>
+
+            <button class="generate-btn" onclick="generatePreview()">Generate Preview</button>
+            <button class="download-btn" onclick="downloadTicket()">Download Ticket</button>
         </div>
-        <!-- Right: preview -->
-        <div class="preview-wrap">
-            <div class="ticket" id="ticketPreview" role="presentation">
-                <div class="header" id="headerArea">
-                    <img id="logoImg" class="logo-img" src="https://b.zmtcdn.com/data/district/web_assets/district-logo-white.png" alt="district logo" crossorigin="anonymous" />
+
+        <div class="preview-panel">
+            <div class="ticket">
+                <div class="ticket-header">
+                    <img src="district-logo-white.png" alt="District by Zomato" class="ticket-logo">
                 </div>
-                <div class="top">
-                    <div class="poster" id="posterPreview"><img id="posterImg" src="" alt="poster" style="display:none"></div>
-                    <div style="flex:1">
-                        <div class="title" id="pvTitle">Movie Title</div>
-                        <div class="meta" id="pvMeta">Telugu | 2D</div>
-                    </div>
-                    <div style="text-align:right">
-                        <div id="pvDate">Date</div>
-                        <div class="meta" id="pvTime">Time</div>
+
+                <div class="movie-info">
+                    <img id="previewPoster" class="movie-poster" src="https://via.placeholder.com/60x90?text=Poster" alt="Movie Poster">
+                    <div class="movie-details">
+                        <div class="movie-title" id="previewTitle">Avatar 3: Fire & Ash</div>
+                        <div class="movie-meta" id="previewMeta">Telugu | 2D</div>
+                        <div class="movie-date-time" id="previewDateTime">Tue, Dec 23 | 9:30 PM</div>
                     </div>
                 </div>
-                <div class="big-placeholder" id="qrPlaceholder" aria-hidden="true">
-                    <!-- intentionally blank white box for manual QR placement -->
+
+                <div class="qr-placeholder" id="qrPlaceholder">
+                    <!-- QR Code will be generated here -->
                 </div>
-                <div class="info">
-                    <div class="line">SCREEN</div>
-                    <div class="value" id="pvScreen">-</div>
-                    <div class="line" style="margin-top:10px">SEAT</div>
-                    <div class="value" id="pvSeats">-</div>
-                    <div class="line" style="margin-top:10px">THEATRE</div>
-                    <div class="value" id="pvTheatre">-</div>
+
+                <div class="ticket-details">
+                    <div class="screen"><span id="previewScreen">1</span></div>
+                    <div class="seat"><span id="previewSeat">PRIME- Q3,Q4</span></div>
+                    <div class="theatre"><span id="previewTheatre">Megaplex Mall of Asia Bangalore</span></div>
                 </div>
-                <div class="perforation" aria-hidden="true"></div>
-                <!-- Removed duplicate theatre name here -->
-                <div class="booking" id="pvBooking">Booking ID: -</div>
-                <div class="bottom-bar">
-                    <img id="bottomLogo" class="bottom-logo" src="https://b.zmtcdn.com/data/district/web_assets/district-logo-white.png" alt="district" crossorigin="anonymous" />
+
+                <div class="perforation"></div>
+
+                <div class="theatre-address" id="previewAddress">Megaplex Mall of Asia Bangalore</div>
+                <div class="booking-id" id="previewBookingId">Booking ID: BK-6486473973</div>
+
+                <div class="ticket-footer">
+                    <img src="district-logo-white.png" alt="District by Zomato" class="footer-logo">
                     <div class="hashtag">#SeeYouThere</div>
                 </div>
-                <a id="downloadTicketBtn" class="download" href="#" style="display:block;margin-top:14px;text-decoration:none;color:#fff;background:linear-gradient(90deg,#2db04b,#178f2f);padding:10px;border-radius:8px;text-align:center;font-weight:800;" onclick="downloadTicket(event)">Download Ticket</a>
             </div>
         </div>
     </div>
 
     <script>
-        (function () {
-            // elements
-            const posterFile = document.getElementById('posterFile');
-            const posterImg = document.getElementById('posterImg');
-            const posterPreview = document.getElementById('posterPreview');
-            const pvTitle = document.getElementById('pvTitle');
-            const pvMeta = document.getElementById('pvMeta');
-            const pvDate = document.getElementById('pvDate');
-            const pvTime = document.getElementById('pvTime');
-            const pvScreen = document.getElementById('pvScreen');
-            const pvSeats = document.getElementById('pvSeats');
-            const pvTheatre = document.getElementById('pvTheatre');
-            const pvBooking = document.getElementById('pvBooking');
-            // defaults
-            function setDefaults() {
-                const now = new Date();
-                document.getElementById('movieDate').value = now.toISOString().split('T')[0];
-                let hh = String(now.getHours()).padStart(2, '0');
-                let mm = now.getMinutes() < 30 ? '00' : '30';
-                document.getElementById('movieTime').value = hh + ':' + mm;
-                document.getElementById('lang').value = 'Telugu | 2D';
+        function generatePreview() {
+            // Get form values
+            const title = document.getElementById('title').value || 'Movie Title';
+            const language = document.getElementById('language').value || 'English | 2D';
+            const date = document.getElementById('date').value;
+            const time = document.getElementById('time').value;
+            const theatre = document.getElementById('theatre').value || 'Theatre Name';
+            const screen = document.getElementById('screen').value || '1';
+            const seats = document.getElementById('seats').value || 'A1';
+            let bookingId = document.getElementById('bookingId').value;
+
+            // Auto-generate Booking ID if empty
+            if (!bookingId) {
+                bookingId = 'BK-' + Date.now().toString().slice(-10);
             }
-            setDefaults();
-            // poster handling
-            let posterDataUrl = null;
-            posterFile.addEventListener('change', function (ev) {
-                const f = ev.target.files && ev.target.files[0];
-                if (!f) { posterDataUrl = null; posterImg.style.display = 'none'; posterPreview.style.background = ''; return; }
+
+            // Format date
+            const dateObj = new Date(date);
+            const options = { weekday: 'short', day: 'numeric', month: 'short' };
+            const formattedDate = dateObj.toLocaleDateString('en-US', options);
+
+            // Format time
+            const timeObj = new Date(`2000-01-01T${time}`);
+            const formattedTime = timeObj.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: true });
+
+            // Update preview
+            document.getElementById('previewTitle').textContent = title;
+            document.getElementById('previewMeta').textContent = language;
+            document.getElementById('previewDateTime').textContent = `${formattedDate} | ${formattedTime}`;
+            document.getElementById('previewScreen').textContent = screen;
+            document.getElementById('previewSeat').textContent = seats;
+            document.getElementById('previewTheatre').textContent = theatre;
+            document.getElementById('previewAddress').textContent = theatre;
+            document.getElementById('previewBookingId').textContent = `Booking ID: ${bookingId}`;
+
+            // Handle poster upload
+            const posterInput = document.getElementById('poster');
+            const previewPoster = document.getElementById('previewPoster');
+
+            if (posterInput.files && posterInput.files[0]) {
                 const reader = new FileReader();
-                reader.onload = function (e) {
-                    posterDataUrl = e.target.result;
-                    posterImg.src = posterDataUrl;
-                    posterImg.style.display = 'block';
-                    posterPreview.style.background = '';
+                reader.onload = function(e) {
+                    previewPoster.src = e.target.result;
                 };
-                reader.readAsDataURL(f);
-            });
-            function genBooking() {
-                return 'BK-' + Date.now().toString().slice(-10);
+                reader.readAsDataURL(posterInput.files[0]);
+            } else {
+                // Fallback to placeholder
+                previewPoster.src = 'https://via.placeholder.com/60x90?text=Poster';
             }
-            // generate preview (no QR generation)
-            window.generatePreview = function () {
-                const movieName = document.getElementById('movieName').value.trim() || 'Movie Title';
-                const movieDate = document.getElementById('movieDate').value;
-                const movieTime = document.getElementById('movieTime').value;
-                const theatre = document.getElementById('theatre').value.trim() || 'V Mega Anand Cine Complex, National Highway 18, Kurnool';
-                const screen = document.getElementById('screen').value.trim() || 'Screen-1';
-                const seats = document.getElementById('seats').value.trim() || 'GOLD-B9';
-                const lang = document.getElementById('lang').value.trim() || 'Telugu | 2D';
-                const booking = document.getElementById('booking').value.trim() || genBooking();
-                pvTitle.textContent = movieName;
-                pvMeta.textContent = lang;
-                try {
-                    const dObj = new Date(movieDate + 'T' + movieTime);
-                    pvDate.textContent = dObj.toLocaleDateString(undefined, { weekday: 'short', day: 'numeric', month: 'short' });
-                    pvTime.textContent = new Date('1970-01-01T' + movieTime).toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' });
-                } catch (e) {
-                    pvDate.textContent = movieDate || 'Date';
-                    pvTime.textContent = movieTime || 'Time';
-                }
-                pvScreen.textContent = screen.toUpperCase();
-                pvSeats.textContent = seats.toUpperCase();
-                pvTheatre.textContent = theatre;
-                pvBooking.textContent = 'Booking ID: ' + booking;
-                // poster preview fallback
-                if (posterDataUrl) {
-                    posterImg.src = posterDataUrl;
-                    posterImg.style.display = 'block';
-                    posterPreview.style.background = '';
-                } else {
-                    posterImg.style.display = 'none';
-                    posterPreview.style.background = 'linear-gradient(180deg,#2a2a2a,#111)';
-                }
-            };
-            // reset
-            window.resetAll = function () {
-                document.getElementById('movieName').value = '';
-                document.getElementById('theatre').value = '';
-                document.getElementById('screen').value = '';
-                document.getElementById('seats').value = '';
-                document.getElementById('booking').value = '';
-                posterFile.value = '';
-                posterImg.src = '';
-                posterImg.style.display = 'none';
-                posterPreview.style.background = '';
-                setDefaults();
-                pvTitle.textContent = 'Movie Title';
-                pvMeta.textContent = 'Telugu | 2D';
-                pvDate.textContent = 'Date';
-                pvTime.textContent = 'Time';
-                pvScreen.textContent = '-';
-                pvSeats.textContent = '-';
-                pvTheatre.textContent = '-';
-                pvBooking.textContent = 'Booking ID: -';
-            };
-            // download full ticket PNG (no QR inside — only white placeholder)
-            window.downloadTicket = function (ev) {
-                ev && ev.preventDefault && ev.preventDefault();
-                // create offscreen canvas
-                const W = 1000, H = 1600;
-                const off = document.createElement('canvas');
-                off.width = W; off.height = H;
-                const ctx = off.getContext('2d');
-                // background
-                ctx.fillStyle = '#060609';
-                ctx.fillRect(0, 0, W, H);
-                // inner card
-                const pad = 64;
-                ctx.fillStyle = '#0f1113';
-                roundRect(ctx, pad / 2, pad / 2, W - pad, H - pad, 32, true, false);
-                // header pattern (top) — draw darker rectangle
-                const headerH = 160;
-                ctx.fillStyle = '#14121a';
-                roundRect(ctx, pad / 2 + 8, pad / 2 + 8, W - pad - 16, headerH, 20, true, false);
-                // draw logo (attempt external - fallback to text)
-                const logoUrl = 'https://b.zmtcdn.com/data/district/web_assets/district-logo-white.png';
-                const logo = new Image();
-                let logoDrawn = false;
-                logo.crossOrigin = 'anonymous';
-                logo.onload = function () {
-                    const logoW = 420;
-                    const logoH = Math.round((logo.height / logo.width) * logoW);
-                    ctx.drawImage(logo, (W - logoW) / 2, pad / 2 + 24, logoW, logoH);
-                    logoDrawn = true;
-                    drawMain();
-                };
-                logo.onerror = function () {
-                    // fallback - text logo
-                    ctx.fillStyle = '#fff';
-                    ctx.font = 'bold 48px Arial';
-                    ctx.textAlign = 'center';
-                    ctx.fillText('district', W / 2, pad / 2 + 80);
-                    ctx.font = '16px Arial';
-                    ctx.fillText('BY ZOMATO', W / 2, pad / 2 + 110);
-                    drawMain();
-                };
-                logo.src = logoUrl;
-                // main draw function that executes after logo (or fallback) finishes
-                function drawMain() {
-                    // poster area
-                    const posterW = 260, posterH = 380;
-                    const px = pad + 40, py = pad + headerH + 40;
-                    roundRect(ctx, px - 8, py - 8, posterW + 16, posterH + 16, 12, true, false); // background
-                    if (posterDataUrl) {
-                        const img = new Image();
-                        img.crossOrigin = 'anonymous';
-                        img.onload = function () {
-                            const ratio = Math.max(posterW / img.width, posterH / img.height);
-                            const sw = posterW / ratio, sh = posterH / ratio;
-                            const sx = (img.width - sw) / 2, sy = (img.height - sh) / 2;
-                            ctx.drawImage(img, sx, sy, sw, sh, px, py, posterW, posterH);
-                            drawRightAndPlaceholder();
-                        };
-                        img.onerror = function () { // if poster fails, draw placeholder
-                            ctx.fillStyle = '#222';
-                            roundRect(ctx, px, py, posterW, posterH, 10, true, false);
-                            drawRightAndPlaceholder();
-                        };
-                        img.src = posterDataUrl;
-                    } else {
-                        // placeholder
-                        const g = ctx.createLinearGradient(px, py, px + posterW, py + posterH);
-                        g.addColorStop(0, '#2a2a2a');
-                        g.addColorStop(1, '#111');
-                        ctx.fillStyle = g;
-                        roundRect(ctx, px, py, posterW, posterH, 10, true, false);
-                        ctx.fillStyle = '#777';
-                        ctx.font = 'bold 22px Arial';
-                        ctx.fillText('POSTER', px + 24, py + 40);
-                        drawRightAndPlaceholder();
-                    }
-                }
-                function drawRightAndPlaceholder() {
-                    const rx = pad + 320;
-                    const rw = W - rx - pad;
-                    // title
-                    ctx.fillStyle = '#fff';
-                    ctx.font = 'bold 44px Arial';
-                    wrapText(ctx, pvTitle.textContent, rx, pad + 200, rw - 40, 46);
-                    // meta
-                    ctx.fillStyle = '#bdbdbd';
-                    ctx.font = '20px Arial';
-                    ctx.fillText(pvMeta.textContent, rx, pad + 320);
-                    // date/time
-                    ctx.fillStyle = '#fff';
-                    ctx.font = '28px Arial';
-                    ctx.fillText(pvDate.textContent + '   |   ' + pvTime.textContent, rx, pad + 360);
-                    // big white QR placeholder centered
-                    const qsize = 420;
-                    const qx = (W - qsize) / 2;
-                    const qy = pad + 480;
-                    ctx.fillStyle = '#ffffff';
-                    roundRect(ctx, qx, qy, qsize, qsize, 34, true, false);
-                    // screen & seat under placeholder
-                    ctx.fillStyle = '#bdbdbd';
-                    ctx.font = '18px Arial';
-                    ctx.fillText('SCREEN', W / 2, qy + qsize + 60);
-                    ctx.fillStyle = '#fff';
-                    ctx.font = '22px Arial';
-                    ctx.fillText(pvScreen.textContent, W / 2, qy + qsize + 100);
-                    ctx.fillStyle = '#bdbdbd';
-                    ctx.font = '18px Arial';
-                    ctx.fillText('SEAT', W / 2, qy + qsize + 150);
-                    ctx.fillStyle = '#fff';
-                    ctx.font = '22px Arial';
-                    ctx.fillText(pvSeats.textContent, W / 2, qy + qsize + 190);
-                    // perforation dashed line
-                    const perY = qy + qsize + 240;
-                    ctx.strokeStyle = 'rgba(255,255,255,0.08)';
-                    ctx.lineWidth = 2;
-                    dashedLine(ctx, pad + 30, perY, W - pad - 30, perY, 14, 12);
-                    // address (removed duplicate theatre name)
-                    // ctx.fillStyle = '#d6d6d6'; ctx.font = '18px Arial';
-                    // wrapText(ctx, pvAddress.textContent, pad + 40, perY + 48, W - 2*(pad+40), 26);
-                    // booking id
-                    ctx.fillStyle = 'rgba(255,255,255,0.6)';
-                    ctx.font = '16px Arial';
-                    ctx.fillText(pvBooking.textContent, W / 2, H - pad - 80);
-                    // bottom logo + hashtag (try to draw logo again small)
-                    const bottomLogo = new Image();
-                    bottomLogo.crossOrigin = 'anonymous';
-                    bottomLogo.onload = function () {
-                        const lw = 180, lh = Math.round(bottomLogo.height / bottomLogo.width * lw);
-                        ctx.drawImage(bottomLogo, pad + 30, H - pad - lh - 10, lw, lh);
-                        // hashtag
-                        ctx.font = 'bold 36px Arial';
-                        ctx.fillStyle = '#fff';
-                        ctx.fillText('#SeeYouThere', W - pad - 280, H - pad - 30);
-                        // save
-                        finish();
-                    };
-                    bottomLogo.onerror = function () {
-                        // fallback text logo
-                        ctx.font = 'bold 28px Arial';
-                        ctx.fillStyle = '#fff';
-                        ctx.fillText('district', pad + 30, H - pad - 40);
-                        ctx.font = 'bold 36px Arial';
-                        ctx.fillStyle = '#fff';
-                        ctx.fillText('#SeeYouThere', W - pad - 280, H - pad - 30);
-                        finish();
-                    };
-                    bottomLogo.src = 'https://b.zmtcdn.com/data/district/web_assets/district-logo-white.png';
-                }
-                function finish() {
-                    // trigger download
-                    const data = off.toDataURL('image/png');
-                    const a = document.createElement('a');
-                    a.href = data;
-                    a.download = (pvTitle.textContent || 'ticket') + '-ticket.png';
-                    a.click();
-                }
-                // helpers
-                function roundRect(ctx, x, y, w, h, r, fill, stroke) {
-                    if (typeof r === 'undefined') r = 6;
-                    ctx.beginPath();
-                    ctx.moveTo(x + r, y);
-                    ctx.arcTo(x + w, y, x + w, y + h, r);
-                    ctx.arcTo(x + w, y + h, x, y + h, r);
-                    ctx.arcTo(x, y + h, x, y, r);
-                    ctx.arcTo(x, y, x + w, y, r);
-                    ctx.closePath();
-                    if (fill) ctx.fill();
-                    if (stroke) ctx.stroke();
-                }
-                function wrapText(ctx, text, x, y, maxWidth, lineHeight) {
-                    const words = text.split(' ');
-                    let line = '';
-                    for (let n = 0; n < words.length; n++) {
-                        const testLine = line + words[n] + ' ';
-                        const metrics = ctx.measureText(testLine);
-                        const testWidth = metrics.width;
-                        if (testWidth > maxWidth && n > 0) {
-                            ctx.fillText(line, x, y);
-                            line = words[n] + ' ';
-                            y += lineHeight;
-                        } else {
-                            line = testLine;
-                        }
-                    }
-                    ctx.fillText(line, x, y);
-                }
-                function dashedLine(ctx, x1, y1, x2, y2, dash, gap) {
-                    ctx.beginPath();
-                    let x = x1, y = y1;
-                    const dx = x2 - x1, dy = y2 - y1;
-                    const dist = Math.sqrt(dx * dx + dy * dy);
-                    const steps = Math.floor(dist / (dash + gap));
-                    const vx = dx / dist * (dash + gap);
-                    const vy = dy / dist * (dash + gap);
-                    for (let i = 0; i < steps; i++) {
-                        ctx.moveTo(x + i * vx, y + i * vy);
-                        ctx.lineTo(x + i * vx + (dx / dist) * dash, y + i * vy + (dy / dist) * dash);
-                    }
-                    ctx.stroke();
-                }
-            };
-        })();
+        }
+
+        function downloadTicket() {
+            const ticket = document.querySelector('.ticket');
+            
+            // Create canvas
+            const canvas = document.createElement('canvas');
+            const ctx = canvas.getContext('2d');
+            
+            // Set canvas size to match ticket (with some padding)
+            const width = 350;
+            const height = 500;
+            canvas.width = width;
+            canvas.height = height;
+            
+            // Fill background
+            ctx.fillStyle = '#0a0a0b';
+            ctx.fillRect(0, 0, width, height);
+            
+            // Draw ticket content
+            const ticketContent = ticket.cloneNode(true);
+            ticketContent.style.width = '100%';
+            ticketContent.style.height = 'auto';
+            
+            // Convert to image
+            const dataUrl = ticket.toDataURL('image/png');
+            
+            // Create link and trigger download
+            const link = document.createElement('a');
+            link.download = 'district-ticket.png';
+            link.href = dataUrl;
+            link.click();
+        }
+
+        // Generate preview on page load
+        window.addEventListener('DOMContentLoaded', generatePreview);
     </script>
 </body>
 </html>
